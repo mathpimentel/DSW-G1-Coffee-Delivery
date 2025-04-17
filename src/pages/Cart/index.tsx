@@ -45,6 +45,8 @@ interface CoffeeInCart {
 } 
 
 const DELIVERY_PRICE = 3.75;
+let juros = 0
+let metodo_pagamento = "Pix ou dinheiro" 
 
 export function Cart() {
   const [coffeesInCart, setCoffeesInCart] = useState<CoffeeInCart[]>([
@@ -132,6 +134,35 @@ export function Cart() {
       prevState.filter((coffee) => coffee.id !== itemId),
     )
   }
+    
+    const [credit, setCredit] = useState<boolean>(false)
+    const [debit, setDebit] = useState<boolean>(false)
+    const [pix, setPix] = useState<boolean>(true)
+
+    function paymnentOptions(option : string){
+      if(option === 'credit'){
+        setCredit(true)
+        setDebit(false)
+        setPix(false)
+        juros = 3.75
+        metodo_pagamento = "Cartão de crédito"
+
+      }
+      else if(option === 'debit'){
+        setCredit(false)
+        setDebit(true)
+        setPix(false)
+        juros = 1.85
+        metodo_pagamento = "Cartão de débito"
+
+      }else{
+        setCredit(false)
+        setDebit(false)
+        setPix(true)
+        juros = 0
+        metodo_pagamento = "Pix ou dinheiro"
+      }
+    }
 
   return (
     <Container>
@@ -155,17 +186,17 @@ export function Cart() {
             <PaymentOptions>
               <div>
                 <Radio
-                  isSelected={false}
-                  onClick={() => {}}
-                  value="credit"
+                  isSelected={credit}
+                  onClick={(e) => paymnentOptions(e.target.value)}
+                  value="credit" //passa isso pra função o target.value
                 >
                   <CreditCard size={16} />
                   <span>Cartão de crédito</span>
                 </Radio>
 
                 <Radio
-                  isSelected={false}
-                  onClick={() => {}}
+                  isSelected={debit}
+                  onClick={(e) => paymnentOptions(e.target.value)}
                   value="debit"
                 >
                   <Bank size={16} />
@@ -173,8 +204,8 @@ export function Cart() {
                 </Radio>
 
                 <Radio
-                  isSelected={true}
-                  onClick={() => {}}
+                  isSelected={pix}
+                  onClick={(e) => paymnentOptions(e.target.value)}
                   value="cash"
                 >
                   <Money size={16} />
@@ -248,18 +279,37 @@ export function Cart() {
                 {new Intl.NumberFormat('pt-br', {
                   currency: 'BRL',
                   style: 'currency',
-                }).format(DELIVERY_PRICE)}
+                }).format(DELIVERY_PRICE * amountTags.length)}
               </span>
             </div>
 
             <div>
-              <span>Total</span>
+              <span>Método de pagamento escolhido</span>
+              <span>
+                {metodo_pagamento}
+              </span>
+            </div>
+
+            <div>
+              <span>Juros</span>
+              <span>
+                {juros} %
+              </span>
+            </div>
+
+
+            <div>
+              <span>Total</span>  
+
               <span>
                 {new Intl.NumberFormat('pt-br', {
                   currency: 'BRL',
                   style: 'currency',
-                }).format(totalItemsPrice + (DELIVERY_PRICE * amountTags.length))}
+                }).format( (totalItemsPrice + (DELIVERY_PRICE * amountTags.length))
+                * (1 + juros/100))}
               </span>
+
+
             </div>
           </CartTotalInfo>
 

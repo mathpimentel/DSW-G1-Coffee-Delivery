@@ -29,7 +29,7 @@ type CoffeeCardProps = {
   handleFavoriteCoffee: (id: string) => void
 }
 
-export function CoffeeCard({ coffee, incrementQuantity, decrementQuantity }: CoffeeCardProps) {
+export function CoffeeCard({ coffee, incrementQuantity, decrementQuantity, handleFavoriteCoffee }: CoffeeCardProps) {
   const theme = useTheme();
   /**
    * Cor brancoa do coração quando o café não é favorito: theme.colors['base-card']
@@ -61,8 +61,8 @@ export function CoffeeCard({ coffee, incrementQuantity, decrementQuantity }: Cof
             decrementQuantity={() => decrementQuantity(coffee.id)}
           />
 
-          <button onClick={() => {}}>
-            <Heart size={22}  color={theme.colors['base-card']} />
+          <button onClick={() => handleFavoriteCoffee(coffee.id)}>
+            <Heart size={22}  color={coffee.favorite ? "red" : theme.colors['base-card']} />
           </button>
         </Order>
       </Control>

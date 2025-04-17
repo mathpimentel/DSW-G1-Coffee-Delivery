@@ -22,13 +22,15 @@ interface Coffee {
 export function Home() {
   const theme = useTheme();
   const [coffees, setCoffees] = useState<Coffee[]>([]);
+  const [oldCoffees, setOldCoffees] = useState<Coffee[]>([])
 
   useEffect(() => {
     async function fetchCoffees() {
-      const response = await api('/coffees');
-      setCoffees(response.data);
-
+      const response = await api.get<Coffee[]>('/coffees');
+      const ordemAlfabetica = response.data.sort((a:any, b:any) => a.title.localeCompare(b.title))
+      
       console.log({coffees: response.data});
+      setCoffees(ordemAlfabetica);
     }
     fetchCoffees();
   }, []);
@@ -76,7 +78,49 @@ export function Home() {
         return coffee
       }),
     )
-    
+  }
+
+  const [selectedTrad, setSelectedTrad] = useState<boolean>(false)
+  function filterTradicional(){
+    const cafesTradicionais = coffees.filter( (coffee) => (coffee.tags.includes('tradicional')))
+    if(!selectedTrad){
+      setOldCoffees(coffees)
+      setCoffees(cafesTradicionais)
+
+    }else{
+      setCoffees(oldCoffees)
+    }
+    setSelectedTrad(!selectedTrad)
+    setSelectedGelado(false)
+    setSelectedComLeite(false)
+  }
+
+  const [selectedGelado, setSelectedGelado] = useState<boolean>(false)
+  function filterGelado(){
+    const cafesGelados = coffees.filter( (coffee) => (coffee.tags.includes('gelado')))
+    if(!selectedGelado){
+      setOldCoffees(coffees)
+      setCoffees(cafesGelados)
+    }else{
+      setCoffees(oldCoffees)
+    }
+    setSelectedGelado(!selectedGelado)
+    setSelectedTrad(false)
+    setSelectedComLeite(false)
+  }
+
+  const [selectedComLeite, setSelectedComLeite] = useState<boolean>(false)
+  function filterComLeite(){
+    const cafesComLeite = coffees.filter( (coffee) => (coffee.tags.includes('com leite')) )
+    if(!selectedComLeite){
+      setOldCoffees(coffees)
+      setCoffees(cafesComLeite)
+    }else{
+      setCoffees(oldCoffees)
+    }
+    setSelectedComLeite(!selectedComLeite)
+    setSelectedTrad(false)
+    setSelectedGelado(false)
   }
 
   return (
@@ -147,22 +191,24 @@ export function Home() {
         <h2>Nossos cafés</h2>
         <Navbar>
           <Radio
-            onClick={() => {}}
-            isSelected={false}
+            onClick={() => filterTradicional()}
+            isSelected={selectedTrad} 
             value="tradicional"
           >
             <span>Tradicional</span>
           </Radio>
+
           <Radio
-            onClick={() => {}}
-            isSelected={false}
+            onClick={() => filterGelado()}
+            isSelected={selectedGelado}
             value="gelado"
           >
             <span>Gelado</span>
           </Radio>
+
           <Radio
-            onClick={() => {}}
-            isSelected={false}
+            onClick={() => filterComLeite()}
+            isSelected={selectedComLeite}
             value="com leite"
           >
             <span>Com leite</span>
